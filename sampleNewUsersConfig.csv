@@ -1,0 +1,2 @@
+first name,last name,email address,password,user login,routing profile name,security_profile_name_1|security_profile_name_2,phone type (soft/desk),phone number,soft phone auto accept (yes/no),ACW timeout (seconds)
+FirstName,LastName,abc@sth.com,a12dadf123,IAM@d-9c672b40de,Basic Routing Profile,,soft,,no,0
