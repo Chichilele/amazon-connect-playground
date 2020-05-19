@@ -2,7 +2,8 @@
 # G. Castro ECS
 # May 2020
 
-# CSV required for example 
-# *.csv
+# data files 
+*.csv
+*.json
 
 .vscode
