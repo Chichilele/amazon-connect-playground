@@ -93,29 +93,42 @@ with open('connect_jsons/update_user_hierarchy.json', 'w') as f:
 
 ############################
 ## add users
-# response = []
-# for i in range(3):
-i = 1
-r = client.create_user(
-    Username=f"agent-{i:03}",
-    Password='Testpassword1',
-    IdentityInfo={
-        'FirstName': f"Agent-{i:03}",
-        'LastName': 'Connect',
-        'Email': f"agent-{i:03}.connect@email.co.uk"
-    },
-    PhoneConfig={
-        'PhoneType': 'SOFT_PHONE',
-        'AutoAccept': False,
-        'AfterContactWorkTimeLimit': 120,
-        # 'DeskPhoneNumber': 'string'
-    },
-    # DirectoryUserId='string',
-    SecurityProfileIds=[
-        'd076dd88-f192-461b-9b8e-4c0790362624',
-    ],
-    RoutingProfileId='453cf9c8-b936-4f06-876a-654b701db548',
-    HierarchyGroupId='0d3f9236-c93a-4f4a-b178-bb5297293275',
-    InstanceId=instance_id,
-)
-    # response.append(r)
+response = []
+for i in range(1, 21):
+# i = 1
+    new_user = {
+        "Username":f"agent-{i:03}",
+        "Password":'Testpassword1',
+        "IdentityInfo":{
+            'FirstName': f"Agent-{i:03}",
+            'LastName': 'Connect',
+            'Email': f"agent-{i:03}.connect@email.co.uk"
+        },
+        "PhoneConfig":{
+            'PhoneType': 'SOFT_PHONE',
+            'AutoAccept': False,
+            'AfterContactWorkTimeLimit': 120,
+            # 'DeskPhoneNumber': 'string'
+        },
+        # DirectoryUserId='string',
+        "SecurityProfileIds":[
+            'd076dd88-f192-461b-9b8e-4c0790362624',
+        ],
+        "RoutingProfileId":'453cf9c8-b936-4f06-876a-654b701db548',
+        "HierarchyGroupId":'0d3f9236-c93a-4f4a-b178-bb5297293275',
+        "InstanceId":instance_id,
+    }
+    try:
+        print(f"adding {new_user['Username']}")
+        r = client.create_user(**new_user)
+        print("done.")
+    except Exception as e: 
+        print(f"couldn't create {new_user['Username']}. The following error occured")
+        print(e)
+
+    response.append(r)
+
+## dump reponse to formatted json
+with open('connect_jsons/created_20agents.json', 'w') as f:
+    json.dump(response, f, indent=2)
+
