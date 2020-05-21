@@ -55,7 +55,7 @@ def update_each_user(update_data, hierarchy_groups):
                 "response": r
             })
         except Exception as e:
-            print(f"Exception... {type(e).__name__}: {e}")
+            print(f"{type(e).__name__}: {e}")
             response["fail"].append({
                 "request": request,
                 "response": r
