@@ -23,25 +23,35 @@ def get_user_updates(csv_path):
     with open(csv_path, newline='') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
-            csv_dict[row["username"]] = {"hg": row['hierarchygroup']}
+            csv_dict[row["username"]] = {"hg": row["hierarchygroup"]}
     return csv_dict
 
 def update_each_user(update_data, hierarchy_groups):
-    response = []
+    response = {"sucess": [], "fail": []}
     for name, user in update_data.items():
-        print({"username": f"{name:<10}", "user_id": f"{user.get('id', 'UNKOWN_USERID')}",
-                "hierarchy_group": f"{user['hg']}", "hierarchy_group_id": f"{hierarchy_groups.get(user['hg'], 'UNKOWN_HG_ID')}"})
+        request = {"username": f"{name:<10}", "user_id": f"{user.get('id', 'UNKOWN_USER_ID')}",
+                "hierarchy_group": f"{user['hg']}", "hierarchy_group_id": f"{hierarchy_groups.get(user['hg'], 'UNKOWN_HG_ID')}"}
         
         try:
             r = connect_client.update_user_hierarchy(
-                HierarchyGroupId=hierarchy_groups.get(user['hg'], 'UNKOWN_HIERARCHY_GROUP_ID'),
-                UserId=user.get('id', 'UNKOWN_USER_ID'),
+                HierarchyGroupId=hierarchy_groups.get(user["hg"], "UNKOWN_HIERARCHY_GROUP_ID"),
+                UserId=user.get("id", "UNKOWN_USER_ID"),
                 InstanceId=CONNECT_INSTANCE_ID
             )
+            response["sucess"].append({
+                "request": request,
+                "response": r
+            })
         except Exception as e:
             print(f"Exception... {type(e).__name__}: {e}")
-    response.append(r)
-    
+            response["fail"].append({
+                "request": request,
+                "response": r
+            })
+        response["counts"] = {
+            "sucess": len(response["sucess"]),
+            "fail": len(response["fail"])
+        }   
     return response
 
 
@@ -50,7 +60,7 @@ def lambda_handler(event, context):
         ## get event record details
         bucket = record['s3']['bucket']['name']
         key = unquote_plus(record['s3']['object']['key'])
-        print(bucket, )
+        print("bucket: ", bucket, )
         
         ## get file path and download it
         tmpkey = key.replace('/', '')
@@ -68,9 +78,12 @@ def lambda_handler(event, context):
         
         ## get each hierarchy group's id
         response = connect_client.list_user_hierarchy_groups(InstanceId=CONNECT_INSTANCE_ID,)
-        hierarchy_groups = {group["Name"]: group["Id"] for group in response['UserHierarchyGroupSummaryList']}
+        hierarchy_groups = {group["Name"]: group["Id"] for group in response["UserHierarchyGroupSummaryList"]}
         
         ## update connect 
         response = update_each_user(update_data, hierarchy_groups)
+        
+        ## log to CWL
+        print(response)
         
         return response
