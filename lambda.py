@@ -32,16 +32,21 @@ def get_user_updates(csv_path):
 
 
 def update_each_user(update_data, hierarchy_groups):
-    response = []
+    response = {"sucess": {}, "fail": {}}
     for name, id, hg in zip(update_data['username'], update_data['id'], update_data['hierarchygroup']):
         print(f"{name:<10}\t{id}\t {hg}\t {hierarchy_groups[hg]}")
         ## List user hierarchy groups
-        r = connect_client.update_user_hierarchy(
-            HierarchyGroupId=hierarchy_groups[hg],
-            UserId=id,
-            InstanceId=CONNECT_INSTANCE_ID
-        )
-        response.append(r)
+        try:
+            r = connect_client.update_user_hierarchy(
+                HierarchyGroupId=hierarchy_groups[hg],
+                UserId=id,
+                InstanceId=CONNECT_INSTANCE_ID
+            )
+            response["success"][name] = r
+        except Exception as e: 
+            print(f"ERRPR \tcouldn't update {name}. The following error occured")
+            print(e)
+            response["fail"][name] = r
     
     return response
 
