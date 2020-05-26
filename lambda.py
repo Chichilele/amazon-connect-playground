@@ -10,8 +10,8 @@ connect_client = boto3.client('connect')
 s3_client = boto3.client('s3')
 
 ## connect instance ID
-CONNECT_INSTANCE_ID = "3ab95c31-5dad-482b-9b7e-f6929d3b2619"
-
+CONNECT_INSTANCE_ID = "3ab95c31-5dad-482b-9b7e-f6929d3b2619" ## ecs
+CONNECT_INSTANCE_ID = "8fe1f248-258f-4fad-b918-4f9d7c55a641" ## barclays
 
 
 def get_user_updates(csv_path):
