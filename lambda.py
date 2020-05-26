@@ -46,7 +46,6 @@ def update_each_user(update_data, hierarchy_groups):
             print(f"{type(e).__name__}: {e}")
             response["fail"].append({
                 "request": request,
-                "response": r
             })
         response["counts"] = {
             "sucess": len(response["sucess"]),
