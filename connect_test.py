@@ -3,6 +3,8 @@ import json
 
 client = boto3.client('connect')
 instance_id = "3ab95c31-5dad-482b-9b7e-f6929d3b2619"
+instance_id = "8fe1f248-258f-4fad-b918-4f9d7c55a641"
+
 
 ## list users
 response = client.list_users(
@@ -18,10 +20,11 @@ for user in response["UserSummaryList"]:
 
 ## describe user
 response = client.describe_user(
-    UserId="846523c4-80d2-4ee1-a3aa-78e6baaf8a77",
+    # UserId="846523c4-80d2-4ee1-a3aa-78e6baaf8a77", ## ecs-connect
+    UserId="dbda7ab9-122a-4293-8470-140e1c46251b",   ## barclays-connect
     InstanceId=instance_id
 )
-with open('connect_jsons/user_g-agent.json', 'w') as f:
+with open('connect_jsons/user_H04899555.json', 'w') as f:
     json.dump(response, f, indent=2)
 
 
@@ -129,6 +132,40 @@ for i in range(1, 21):
     response.append(r)
 
 ## dump reponse to formatted json
-with open('connect_jsons/created_20agents.json', 'w') as f:
+with open('connect_jsons/created_g-admin.json', 'w') as f:
     json.dump(response, f, indent=2)
 
+
+response = []
+for i in range(1, 21):
+    new_user = {
+        "Username":f"g-admin",
+        "Password":'Testpassword1',
+        "IdentityInfo":{
+            'FirstName': f"Gauthier",
+            'LastName': 'Castro',
+            'Email': f"gauthier.castro@barclays.com"
+        },
+        "PhoneConfig":{
+            'PhoneType': 'SOFT_PHONE',
+            'AutoAccept': False,
+            'AfterContactWorkTimeLimit': 120,
+            # 'DeskPhoneNumber': 'string'
+        },
+        # DirectoryUserId='string',
+        "SecurityProfileIds": [
+            '2b6c3daf-a04f-4f33-83bb-0e373f8fbb66'
+        ],
+        "RoutingProfileId":'747f4cc0-9c36-47a7-ba9a-285f86eb1f84',
+        # "HierarchyGroupId":'0d3f9236-c93a-4f4a-b178-bb5297293275',
+        "InstanceId":instance_id,
+    }
+    try:
+        print(f"adding {new_user['Username']}")
+        r = client.create_user(**new_user)
+        print("done.")
+    except Exception as e: 
+        print(f"couldn't create {new_user['Username']}. The following error occured")
+        print(e)
+
+    response.append(r)
