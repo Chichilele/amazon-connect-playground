@@ -18,13 +18,15 @@ import (
 	"os"
 )
 
+var instance_id = aws.String(os.Getenv("CONNECT_INSTANCE_ID"))
+
+// read csv file and outputs a 2d list of string
 func csvReader(filepath string) [][]string {
 	// 1. Open the file
 	recordFile, err := os.Open(filepath)
 	if err != nil {
 		log.Println("An error encountered ::", err)
 	}
-
 	// 2. Initialize the reader
 	reader := csv.NewReader(recordFile)
 
@@ -69,7 +71,7 @@ func handler(ctx context.Context, s3Event events.S3Event) ([]*connect.UpdateUser
 		for i, r := range records[1:] {
 			updates[i] = connect.UpdateUserHierarchyInput{
 				HierarchyGroupId: aws.String(r[1]),
-				InstanceId:       aws.String("3ab95c31-5dad-482b-9b7e-f6929d3b2619"),
+				InstanceId:       instance_id,
 				UserId:           aws.String(r[0]),
 			}
 			log.Println(updates[i])
@@ -94,7 +96,7 @@ func main() {
 
 func exitErrorf(msg string, args ...interface{}) {
 	log.Printf(msg+"\n", args...)
-	os.Exit(1)
+	// os.Exit(1)
 }
 
 // import (
@@ -122,13 +124,13 @@ func exitErrorf(msg string, args ...interface{}) {
 // 	myObjects = listObjResult.Contents
 
 // 	listUHGInput := &connect.ListUserHierarchyGroupsInput{
-// 		InstanceId: aws.String("3ab95c31-5dad-482b-9b7e-f6929d3b2619"),
+// 		InstanceId: instance_id,
 // 	}
 // 	listUHGResult, _ := connectsvc.ListUserHierarchyGroups(listUHGInput)
 // 	uhg = listUHGResult.UserHierarchyGroupSummaryList
 
 // 	describeUserInput := &connect.DescribeUserInput{
-// 		InstanceId: aws.String("3ab95c31-5dad-482b-9b7e-f6929d3b2619"),
+// 		InstanceId: instance_id,
 // 		UserId:     aws.String("4100e0d6-0418-4b14-8b6a-02d8669ed335"),
 // 	}
 // 	describeUserOutput, _ := connectsvc.DescribeUser(describeUserInput)
